@@ -5,12 +5,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const AppContext = createContext();
 
 export const THEMES = {
-  light: { bg: '#FAFAFA', surface: '#FFFFFF', text: '#18181b', textLight: '#71717a', primary: '#F97316', border: '#E4E4E7', icon: 'black' },
-  dark: { bg: '#09090b', surface: '#18181b', text: '#FAFAFA', textLight: '#A1A1AA', primary: '#F97316', border: '#27272A', icon: 'white' },
-  vscode: { bg: '#1E1E1E', surface: '#252526', text: '#D4D4D4', textLight: '#858585', primary: '#007ACC', border: '#333333', icon: '#D4D4D4' },
-  antigravity: { bg: '#0F172A', surface: '#1E293B', text: '#F8FAFC', textLight: '#94A3B8', primary: '#A855F7', border: '#334155', icon: '#E2E8F0' },
-  hacker: { bg: '#000000', surface: '#111111', text: '#00FF00', textLight: '#008800', primary: '#00FF00', border: '#003300', icon: '#00FF00' },
-  dracula: { bg: '#282a36', surface: '#44475a', text: '#f8f8f2', textLight: '#6272a4', primary: '#ff79c6', border: '#44475a', icon: '#bd93f9' }
+  light: { bg: '#FAFAFA', surface: '#FFFFFF', text: '#18181b', textLight: '#71717a', primary: '#F97316', border: '#E4E4E7', icon: 'black',
+           radius: 24, borderWidth: 0, shadowOp: 0.05, shadowColor: '#000', elevation: 2 },
+  dark: { bg: '#09090b', surface: '#18181b', text: '#FAFAFA', textLight: '#A1A1AA', primary: '#F97316', border: '#27272A', icon: 'white',
+          radius: 16, borderWidth: 1, shadowOp: 0, shadowColor: 'transparent', elevation: 0 },
+  vscode: { bg: '#1E1E1E', surface: '#252526', text: '#D4D4D4', textLight: '#858585', primary: '#007ACC', border: '#333333', icon: '#D4D4D4',
+            radius: 4, borderWidth: 1, shadowOp: 0.2, shadowColor: '#000', elevation: 4 },
+  antigravity: { bg: '#0F172A', surface: '#1E293B', text: '#F8FAFC', textLight: '#94A3B8', primary: '#A855F7', border: '#334155', icon: '#E2E8F0',
+                 radius: 36, borderWidth: 2, shadowOp: 0.3, shadowColor: '#A855F7', elevation: 8 },
+  hacker: { bg: '#000000', surface: '#0a0a0a', text: '#00FF00', textLight: '#008800', primary: '#00FF00', border: '#003300', icon: '#00FF00',
+            radius: 0, borderWidth: 1, shadowOp: 0, shadowColor: 'transparent', elevation: 0 },
+  dracula: { bg: '#282a36', surface: '#44475a', text: '#f8f8f2', textLight: '#6272a4', primary: '#ff79c6', border: '#44475a', icon: '#bd93f9',
+             radius: 12, borderWidth: 1, shadowOp: 0.1, shadowColor: '#ff79c6', elevation: 3 }
+};
+
+const todayDate = new Date();
+const formatMockDate = (offsetDays) => {
+    const d = new Date(todayDate);
+    d.setDate(todayDate.getDate() + offsetDays);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); 
 };
 
 // === THE FINAL 6-USER DATABASE ===
@@ -192,15 +205,21 @@ export const INITIAL_USERS = [
 ];
 
 export const EVENTS = [
-  { id: 1, date: "12 Oct", title: "HackTheFall 2.0", org: "CodeChef", time: "10:00 AM", loc: "Auditorium", type: "Tech", desc: "A massive 48-hour hackathon to build open-source projects. Winner gets ₹50,000 cash prize!" },
-  { id: 2, date: "14 Oct", title: "RoboWars", org: "RoboVITics", time: "02:00 PM", loc: "Amphitheatre", type: "Tech", desc: "Enter your custom built RC bot into the arena and fight for glory in the annual RoboWars." },
-  { id: 3, date: "14 Oct", title: "Game Jam", org: "GameDev Club", time: "05:00 PM", loc: "Lab-4", type: "Tech", desc: "Make a game from scratch in 24 hours based on a central theme. Snacks provided!" },
-  { id: 4, date: "18 Oct", title: "Advitya Music Fest", org: "Music Club", time: "06:00 PM", loc: "Food Street", type: "Cultural", desc: "An evening of live bands, solo performances, and great food near the hostel blocks." },
-  { id: 5, date: "20 Oct", title: "AI in Healthcare", org: "Google DSC", time: "11:00 AM", loc: "AB1-Hall", type: "Workshop", desc: "Learn how deep learning is revolutionizing telemedicine and diagnostics." },
-  { id: 6, date: "22 Oct", title: "VIT Debate Cup", org: "DebSoc", time: "04:00 PM", loc: "LC-Hall 2", type: "Lit", desc: "Compete against some of the fiercest debaters on modern socio-economic topics." },
-  { id: 7, date: "25 Oct", title: "StartUp Pitch Day", org: "E-Cell", time: "09:00 AM", loc: "Incubation Ctr", type: "Biz", desc: "Pitch your startup idea to angel investors and secure early-stage funding." },
-  { id: 8, date: "28 Oct", title: "Cyber Security Bootcamp", org: "OWASP", time: "10:00 AM", loc: "Lab Complex", type: "Tech", desc: "Hands-on CTF solving and vulnerability scanning with industry experts." },
-  { id: 9, date: "30 Oct", title: "Halloween Night", org: "Events Team", time: "07:00 PM", loc: "Hostel Ground", type: "Cultural", desc: "Spooky costumes, a haunted house maze, and Halloween-themed treats!" }
+  { id: 1, date: formatMockDate(0), title: "HackTheFall 2.0", org: "CodeChef", time: "10:00 AM", loc: "Auditorium", type: "Tech", desc: "A massive 48-hour hackathon to build open-source projects. Winner gets ₹50,000 cash prize!" },
+  { id: 2, date: formatMockDate(0), title: "Design Sprint Workshop", org: "UX/UI Club", time: "01:00 PM", loc: "Lab-2", type: "Workshop", desc: "Learn Figma from scratch and design a high-fidelity prototype in 3 hours." },
+  { id: 3, date: formatMockDate(0), title: "Open Mic Night", org: "Music Club", time: "05:30 PM", loc: "Food Street", type: "Cultural", desc: "Sing your heart out or perform standup comedy. Everyone is welcome!" },
+  { id: 4, date: formatMockDate(0), title: "Web3 Pitch Deck", org: "E-Cell", time: "07:00 PM", loc: "AB1-Hall", type: "Biz", desc: "Pitch your blockchain ideas to a panel of expert investors." },
+  { id: 5, date: formatMockDate(1), title: "RoboWars", org: "RoboVITics", time: "02:00 PM", loc: "Amphitheatre", type: "Tech", desc: "Enter your custom built RC bot into the arena and fight for glory in the annual RoboWars." },
+  { id: 6, date: formatMockDate(1), title: "Guest Lecture: AI Trends", org: "Google DSC", time: "04:00 PM", loc: "Main Auditorium", type: "Tech", desc: "A Google architect explains the future of LLMs." },
+  { id: 7, date: formatMockDate(1), title: "Poetry Slam", org: "DebSoc", time: "06:00 PM", loc: "LC-Hall 2", type: "Lit", desc: "Share your unwritten thoughts in a competitive poetry slam." },
+  { id: 8, date: formatMockDate(2), title: "Game Jam", org: "GameDev Club", time: "09:00 AM", loc: "Lab-4", type: "Tech", desc: "Make a game from scratch in 24 hours based on a central theme. Snacks provided!" },
+  { id: 9, date: formatMockDate(2), title: "Dance Battles", org: "StepUp Crew", time: "04:00 PM", loc: "Amphitheatre", type: "Cultural", desc: "1v1 and Crew vs Crew street dance competitions." },
+  { id: 10, date: formatMockDate(2), title: "Financial Literacy ZeroToOne", org: "Finance Club", time: "11:00 AM", loc: "AB2-101", type: "Workshop", desc: "Understand SIPs, Mutual Funds, and long term index investing strategies." },
+  { id: 11, date: formatMockDate(3), title: "Advitya Music Fest", org: "Music Club", time: "06:00 PM", loc: "Food Street", type: "Cultural", desc: "An evening of live bands, solo performances, and great food near the hostel blocks." },
+  { id: 12, date: formatMockDate(3), title: "Debate: Tech Monopolies", org: "DebSoc", time: "02:00 PM", loc: "LC-1", type: "Lit", desc: "Are tech monopolies good for innovation? Come debate it!" },
+  { id: 13, date: formatMockDate(4), title: "AI in Healthcare", org: "Google DSC", time: "11:00 AM", loc: "AB1-Hall", type: "Workshop", desc: "Learn how deep learning is revolutionizing telemedicine and diagnostics." },
+  { id: 14, date: formatMockDate(5), title: "StartUp Pitch Day", org: "E-Cell", time: "09:00 AM", loc: "Incubation Ctr", type: "Biz", desc: "Pitch your startup idea to angel investors and secure early-stage funding." },
+  { id: 15, date: formatMockDate(6), title: "Cyber Security Bootcamp", org: "OWASP", time: "10:00 AM", loc: "Lab Complex", type: "Tech", desc: "Hands-on CTF solving and vulnerability scanning with industry experts." }
 ];
 
 export const AppProvider = ({ children }) => {
@@ -216,9 +235,19 @@ export const AppProvider = ({ children }) => {
     }).catch(()=>{});
   }, []);
 
-  const updateAllUsers = (newUsers) => {
-    setAllUsers(newUsers);
-    AsyncStorage.setItem('vit_chats', JSON.stringify(newUsers)).catch(()=>{});
+  const updateAllUsers = (updaterOrState) => {
+    setAllUsers(prevUsers => {
+      const newUsers = typeof updaterOrState === 'function' ? updaterOrState(prevUsers) : updaterOrState;
+      AsyncStorage.setItem('vit_chats', JSON.stringify(newUsers)).catch(()=>{});
+      
+      setCurrentUser(prevUser => {
+         if(!prevUser) return prevUser;
+         const updatedMe = newUsers.find(u => u.username === prevUser.registration_number || u.id === prevUser.id);
+         return updatedMe ? { ...prevUser, ...updatedMe } : prevUser;
+      });
+      
+      return newUsers;
+    });
   };
 
   const triggerBellAnimation = () => {

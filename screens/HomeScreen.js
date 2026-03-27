@@ -155,7 +155,7 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* HERO CARD - PREMIUM PROFILE/LIVE CLASS */}
-      <Animated.View entering={FadeInDown.delay(200).duration(600)} className="w-full rounded-[32px] p-8 mb-8 shadow-sm border" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+      <Animated.View entering={FadeInDown.delay(200).duration(600)} className="w-full rounded-[32px] p-8 mb-8 shadow-sm border" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
         <StyledView className="flex-row justify-between items-start mb-6">
           <StyledView className="px-4 py-2 rounded-full" style={{ backgroundColor: currentClass.dynamicStatus === 'Live' ? `${theme.primary}20` : `${theme.textLight}20` }}>
             <StyledText className="font-bold text-xs uppercase tracking-wider" style={{ color: currentClass.dynamicStatus === 'Live' ? theme.primary : theme.textLight }}>
@@ -165,7 +165,7 @@ export default function HomeScreen() {
           <StyledText className="text-2xl font-bold" style={{ color: theme.text }}>{currentClass.displayTime}</StyledText>
         </StyledView>
 
-        <StyledText className="text-3xl font-bold leading-tight mb-4" style={{ color: theme.text }}>{currentClass.title}</StyledText>
+        <StyledText className="text-2xl font-bold leading-tight mb-4" style={{ color: theme.text }}>{currentClass.title}</StyledText>
         
         {/* NEW PROFILE / CLASS DETAILS */}
         <StyledView className="flex-row items-center mb-3">
@@ -219,10 +219,10 @@ export default function HomeScreen() {
           <StyledText className="italic text-center mt-4" style={{ color: theme.textLight }}>No classes scheduled for today.</StyledText>
       ) : dynamicSchedule.map((item, i) => (
         <Animated.View key={i} entering={FadeInDown.delay(500 + (i*100))} className="flex-row items-center mb-6">
-           <StyledText className="font-bold w-14 text-right mr-4 leading-tight" style={{ color: theme.textLight }}>{item.displayTime.replace(" - ", "\n")}</StyledText>
-           <StyledView className={`h-full w-[2px] mr-4 absolute left-[70px]`} style={{ backgroundColor: item.dynamicStatus === 'Live' ? theme.primary : theme.border }}/>
+           <StyledText className="font-bold w-[72px] text-right mr-4 leading-tight" style={{ color: theme.textLight }}>{item.displayTime.replace(" - ", "\n")}</StyledText>
+           <StyledView className={`h-full w-[2px] mr-4 absolute left-[88px]`} style={{ backgroundColor: item.dynamicStatus === 'Live' ? theme.primary : theme.border }}/>
            
-           <StyledView className="flex-1 p-5 rounded-2xl border" style={{ backgroundColor: item.isFreeSlot ? `${theme.primary}05` : theme.surface, borderColor: item.dynamicStatus === 'Live' ? theme.primary : theme.border }}>
+           <StyledView className="flex-1 p-5 rounded-2xl border" style={{ backgroundColor: item.isFreeSlot ? `${theme.primary}05` : theme.surface, borderColor: item.dynamicStatus === 'Live' ? theme.primary : theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
               <StyledText className="font-bold text-lg mb-1" style={{ color: item.isFreeSlot ? theme.primary : theme.text }}>{item.title}</StyledText>
               {item.isFreeSlot ? (
                 <StyledText className="text-sm font-medium italic" style={{ color: theme.textLight }}>Suggested: {item.recommendedTask}</StyledText>
@@ -244,7 +244,7 @@ export default function HomeScreen() {
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
              {GRADE_HISTORY.map((hist, i) => (
-                <Animated.View key={i} entering={FadeInDown.delay(100*i)} className="flex-row justify-between items-center p-5 rounded-2xl border mb-4" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+                <Animated.View key={i} entering={FadeInDown.delay(100*i)} className="flex-row justify-between items-center p-5 rounded-2xl border mb-4" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
                   <View>
                     <Text className="text-lg font-bold mb-1" style={{ color: theme.text }}>{hist.semester}</Text>
                     <Text className="text-sm font-medium" style={{ color: theme.textLight }}>Credits Earned: {hist.credits}</Text>

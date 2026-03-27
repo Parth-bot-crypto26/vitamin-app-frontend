@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { styled } from 'nativewind';
 import { AppContext } from '../context/AppContext';
-import { Send, Image as ImageIcon, MapPin, MoreVertical, ChevronLeft, Phone, Video } from 'lucide-react-native';
+import { Send, Image as ImageIcon, ChevronLeft, Paperclip, Check, CheckCheck } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
@@ -12,7 +12,7 @@ export default function ChatScreen() {
   const navigation = useNavigation();
   const [activeChatId, setActiveChatId] = useState(null);
 
-  const potentialBuddies = allUsers.filter(u => u.id !== currentUser.id);
+  const potentialBuddies = allUsers.filter(u => u.id !== currentUser?.id);
 
   if (activeChatId) {
     const buddy = allUsers.find(u => u.id === activeChatId);
@@ -29,20 +29,27 @@ export default function ChatScreen() {
 
         <View className="px-6">
         {potentialBuddies.map((buddy, index) => {
-           const myChats = currentUser.chats[buddy.id] || [];
-           const theirChats = buddy.chats[currentUser.id] || [];
+           const myChats = currentUser?.chats?.[buddy.id] || [];
+           const theirChats = buddy?.chats?.[currentUser.id] || [];
            const allObj = [...myChats, ...theirChats].sort((a,b) => a.timestamp - b.timestamp);
            const lastMsg = allObj.length > 0 ? allObj[allObj.length-1] : null;
            
            return (
             <TouchableOpacity key={buddy.id} onPress={() => setActiveChatId(buddy.id)} activeOpacity={0.8}>
-              <Animated.View entering={FadeInDown.delay(index * 100)} className="flex-row items-center border p-5 rounded-3xl mb-4 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
-                <View className="h-14 w-14 rounded-full items-center justify-center mr-4 border" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+              <Animated.View entering={FadeInDown.delay(index * 100)} className="flex-row items-center border p-5 rounded-3xl mb-4 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
+                <View className="h-14 w-14 rounded-full items-center justify-center mr-4 border" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
                   <Text className="font-bold text-xl" style={{ color: theme.text }}>{buddy.avatar}</Text>
                 </View>
                 <View className="flex-1">
                   <Text className="font-bold text-lg" style={{ color: theme.text }}>{buddy.name}</Text>
-                  <Text className="text-sm" style={{ color: theme.textLight }} numberOfLines={1}>{lastMsg ? lastMsg.text : "Start a conversation..."}</Text>
+                  <View className="flex-row items-center mt-1">
+                    {lastMsg && lastMsg.sender === 'me' && (
+                        lastMsg.status === 'read' ? <CheckCheck size={14} color="#3b82f6" className="mr-1" /> :
+                        lastMsg.status === 'delivered' ? <CheckCheck size={14} color={theme.textLight} className="mr-1" /> :
+                        <Check size={14} color={theme.textLight} className="mr-1" />
+                    )}
+                    <Text className="text-sm" style={{ color: theme.textLight }} numberOfLines={1}>{lastMsg ? lastMsg.text : "Start a conversation..."}</Text>
+                  </View>
                 </View>
               </Animated.View>
             </TouchableOpacity>
@@ -58,8 +65,8 @@ function ChatWindow({ buddy, onBack, theme, currentUser, allUsers, updateAllUser
   const [msg, setMsg] = useState('');
   const scrollViewRef = useRef();
 
-  const mySent = currentUser.chats[buddy.id] || [];
-  const theirSent = buddy.chats[currentUser.id] || [];
+  const mySent = currentUser?.chats?.[buddy.id] || [];
+  const theirSent = buddy?.chats?.[currentUser.id] || [];
   const allMessages = [...mySent.map(m => ({ ...m, type: 'sent' })), ...theirSent.map(m => ({ ...m, type: 'received' }))].sort((a,b) => a.timestamp - b.timestamp);
 
   const sendMessage = () => {
@@ -67,32 +74,41 @@ function ChatWindow({ buddy, onBack, theme, currentUser, allUsers, updateAllUser
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
-    const newMsgObj = { text: msg.trim(), sender: 'me', status: 'delivered', timestamp: Date.now() };
+    const msgId = Date.now().toString();
+    const newMsgObj = { id: msgId, text: msg.trim(), sender: 'me', status: 'sent', timestamp: Date.now() };
     
-    const updatedUsersState = JSON.parse(JSON.stringify(allUsers));
-    const meIndex = updatedUsersState.findIndex(u => u.id === currentUser.id);
-    if (!updatedUsersState[meIndex].chats[buddy.id]) updatedUsersState[meIndex].chats[buddy.id] = [];
-    updatedUsersState[meIndex].chats[buddy.id].push(newMsgObj);
+    updateAllUsers(prevAll => {
+        let updatedUsersState = JSON.parse(JSON.stringify(prevAll));
+        let meIndex = updatedUsersState.findIndex(u => u.id === currentUser.id);
+        if (!updatedUsersState[meIndex].chats[buddy.id]) updatedUsersState[meIndex].chats[buddy.id] = [];
+        updatedUsersState[meIndex].chats[buddy.id].push(newMsgObj);
+        return updatedUsersState;
+    });
 
-    updateAllUsers(updatedUsersState);
     setMsg('');
     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
 
-    // Simulate reply after 1.5s
+    // Simulate "Delivered" after 500ms safely
     setTimeout(() => {
-        if(triggerBellAnimation) triggerBellAnimation();
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        
-        const replyMsgObj = { text: "Got it! Thanks.", sender: 'me', status: 'delivered', timestamp: Date.now() };
-        
-        const nextUsersState = JSON.parse(JSON.stringify(updatedUsersState));
-        const buddyIndex = nextUsersState.findIndex(u => u.id === buddy.id);
-        if (!nextUsersState[buddyIndex].chats[currentUser.id]) nextUsersState[buddyIndex].chats[currentUser.id] = [];
-        nextUsersState[buddyIndex].chats[currentUser.id].push(replyMsgObj);
-        
-        updateAllUsers(nextUsersState);
-        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
-    }, 1500);
+        updateAllUsers(prevAll => {
+            let nextUsersState = JSON.parse(JSON.stringify(prevAll));
+            let mIndex = nextUsersState.findIndex(u => u.id === currentUser.id);
+            const sentMsg = nextUsersState[mIndex].chats[buddy.id].find(m => m.id === msgId);
+            if(sentMsg) sentMsg.status = 'delivered';
+            return nextUsersState;
+        });
+    }, 500);
+
+    // Simulate "Read" after 1.8s safely
+    setTimeout(() => {
+        updateAllUsers(prevAll => {
+            let finalUsersState = JSON.parse(JSON.stringify(prevAll));
+            let mIndex = finalUsersState.findIndex(u => u.id === currentUser.id);
+            const sentMsg = finalUsersState[mIndex].chats[buddy.id].find(m => m.id === msgId);
+            if(sentMsg) sentMsg.status = 'read';
+            return finalUsersState;
+        });
+    }, 1800);
   };
 
   useEffect(() => {
@@ -101,17 +117,17 @@ function ChatWindow({ buddy, onBack, theme, currentUser, allUsers, updateAllUser
 
   return (
     <View className="flex-1" style={{ backgroundColor: theme.surface }}>
-      <View className="flex-row items-center justify-between px-6 pt-12 pb-4 border-b z-10 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+      <View className="flex-row items-center justify-between px-6 pt-12 pb-4 border-b z-10 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
          <View className="flex-row items-center">
-            <TouchableOpacity onPress={onBack} className="mr-4 p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border }}><ChevronLeft size={24} color={theme.text}/></TouchableOpacity>
+            <TouchableOpacity onPress={onBack} className="mr-4 p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}><ChevronLeft size={24} color={theme.text}/></TouchableOpacity>
             <View>
                <Text className="text-xl font-bold" style={{ color: theme.text }}>{buddy.name}</Text>
                <Text className="text-xs font-bold" style={{ color: theme.primary }}>Online</Text>
             </View>
          </View>
          <View className="flex-row space-x-3">
-            <TouchableOpacity className="p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border }}><Phone size={20} color={theme.text}/></TouchableOpacity>
-            <TouchableOpacity className="p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border }}><Video size={20} color={theme.text}/></TouchableOpacity>
+            <TouchableOpacity className="p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}><Paperclip size={20} color={theme.text}/></TouchableOpacity>
+            <TouchableOpacity className="p-2 rounded-full border" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}><ImageIcon size={20} color={theme.text}/></TouchableOpacity>
          </View>
       </View>
 
@@ -121,24 +137,30 @@ function ChatWindow({ buddy, onBack, theme, currentUser, allUsers, updateAllUser
             let formattedTime = "";
             try { formattedTime = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch(e){}
             return (
-              <Animated.View key={i} entering={FadeInUp.delay((i%10)*50)} className={`mb-4 w-[75%] ${isMe ? 'self-end' : 'self-start'}`}>
+              <Animated.View key={m.id || i} entering={FadeInUp.delay((i%10)*50)} className={`mb-4 w-[75%] ${isMe ? 'self-end' : 'self-start'}`}>
                  <View className={`p-4 rounded-3xl ${isMe ? 'rounded-tr-sm shadow-md' : 'rounded-tl-sm border shadow-sm'}`} style={{ backgroundColor: isMe ? theme.primary : theme.bg, borderColor: isMe ? theme.primary : theme.border, shadowColor: isMe ? theme.primary : '#000' }}>
                     <Text className={`text-[15px] leading-6 font-medium`} style={{ color: isMe ? 'white' : theme.text }}>{m.text}</Text>
                  </View>
-                 <Text className={`text-[10px] mt-1 font-bold`} style={{ color: theme.textLight, textAlign: isMe ? 'right' : 'left' }}>{formattedTime}</Text>
+                 <View className={`flex-row mt-1 items-center ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <Text className={`text-[10px] font-bold ${isMe ? 'mr-1' : ''}`} style={{ color: theme.textLight }}>{formattedTime}</Text>
+                    {isMe && (
+                        m.status === 'read' ? <CheckCheck size={12} color="#3b82f6" /> :
+                        m.status === 'delivered' ? <CheckCheck size={12} color={theme.textLight} /> :
+                        <Check size={12} color={theme.textLight} />
+                    )}
+                 </View>
               </Animated.View>
             )
          })}
          <View className="h-6" />
       </ScrollView>
 
-      <View className="p-4 border-t flex-row items-center z-10 pb-8" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
-         <TouchableOpacity className="p-3 mr-3 rounded-full border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border }}><ImageIcon color={theme.textLight} size={20}/></TouchableOpacity>
-         <View className="flex-1 flex-row items-center rounded-full px-4 h-14 border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+      <View className="p-4 border-t flex-row items-center z-10 pb-8" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
+         <View className="flex-1 flex-row items-center rounded-full px-4 h-14 border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
             <TextInput 
                value={msg} 
                onChangeText={setMsg} 
-               placeholder="Type a message..." 
+               placeholder="Message..." 
                placeholderTextColor={theme.textLight}
                style={{ flex: 1, color: theme.text, fontSize: 16 }}
                onSubmitEditing={sendMessage}

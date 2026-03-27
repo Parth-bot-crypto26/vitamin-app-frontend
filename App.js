@@ -6,7 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Menu, Home, Zap, Calendar, Users, MessageSquare, Bot, LogOut, X, Send, Bell, Moon, Sun } from 'lucide-react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS, withSpring, withSequence } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS, withSpring, withSequence, withRepeat } from 'react-native-reanimated';
 import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
 
 // Import Screens
@@ -69,17 +69,7 @@ function MainLayout() {
   const offset = useSharedValue(-300); 
   const bellRotation = useSharedValue(0);
 
-  React.useEffect(() => {
-    if (notificationPulse > 0) {
-      bellRotation.value = withSequence(
-        withTiming(-15, { duration: 50 }),
-        withTiming(15, { duration: 50 }),
-        withTiming(-15, { duration: 50 }),
-        withTiming(15, { duration: 50 }),
-        withTiming(0, { duration: 50 })
-      );
-    }
-  }, [notificationPulse]);
+
 
   const bellAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotateZ: `${bellRotation.value}deg` }]
@@ -138,8 +128,8 @@ function MainLayout() {
     <SafeAreaView className="flex-1 relative" style={{ backgroundColor: theme.bg }}>
       
       {/* HEADER */}
-      <StyledView className="flex-row justify-between items-center px-6 py-4 z-10 border-b shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
-        <TouchableOpacity onPress={toggleSidebar} className="p-2 rounded-full border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+      <StyledView className="flex-row justify-between items-center px-6 py-4 z-10 border-b shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
+        <TouchableOpacity onPress={toggleSidebar} className="p-2 rounded-full border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
           <Menu color={theme.icon} size={24} />
         </TouchableOpacity>
         
@@ -147,12 +137,12 @@ function MainLayout() {
         
         <StyledView className="flex-row space-x-3 items-center">
           {/* THEME SWITCHER */}
-          <TouchableOpacity onPress={cycleTheme} className="p-2 rounded-full border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+          <TouchableOpacity onPress={cycleTheme} className="p-2 rounded-full border shadow-sm" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
             {themeMode === 'light' ? <Moon color={theme.icon} size={20} /> : <Sun color={theme.icon} size={20} />}
           </TouchableOpacity>
 
           {/* NOTIFICATION */}
-          <TouchableOpacity onPress={() => setNotifOpen(true)} className="p-2 rounded-full border shadow-sm relative" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+          <TouchableOpacity onPress={() => setNotifOpen(true)} className="p-2 rounded-full border shadow-sm relative" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
              <Animated.View style={bellAnimatedStyle}>
                <Bell color={theme.icon} size={20} />
              </Animated.View>
@@ -278,7 +268,7 @@ function CocoBot({ onClose, user, theme }) {
           <ScrollView className="flex-1 rounded-3xl p-4 mb-4" style={{ backgroundColor: theme.bg }}>
              <Text className="text-lg leading-7" style={{ color: theme.text }}>{response}</Text>
           </ScrollView>
-          <View className="flex-row items-center rounded-full px-2 border h-14" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+          <View className="flex-row items-center rounded-full px-2 border h-14" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
              <TextInput value={query} onChangeText={setQuery} placeholder="Ask Coco..." placeholderTextColor={theme.textLight} className="flex-1 p-4" style={{ color: theme.text }} />
              <TouchableOpacity onPress={handleAsk} className="h-10 w-10 rounded-full items-center justify-center m-1" style={{ backgroundColor: theme.text }}><Send size={18} color={theme.bg} /></TouchableOpacity>
           </View>

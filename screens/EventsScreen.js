@@ -5,17 +5,24 @@ import { EVENTS, AppContext } from '../context/AppContext';
 import { X, MapPin, Clock, ArrowRight } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const CALENDAR_DAYS = [
-  { date: 12, label: "12 Oct", isHoliday: false },
-  { date: 13, label: "13 Oct", isHoliday: true, note: "Dussehra" },
-  { date: 14, label: "14 Oct", isHoliday: false },
-  { date: 15, label: "15 Oct", isHoliday: false },
-  { date: 16, label: "16 Oct", isHoliday: false },
-  { date: 17, label: "17 Oct", isHoliday: false },
-  { date: 18, label: "18 Oct", isHoliday: false, note: "Fest" },
-  { date: 19, label: "19 Oct", isHoliday: false },
-  { date: 20, label: "20 Oct", isHoliday: false },
-];
+const todayDate = new Date();
+const formatMockDate = (offsetDays) => {
+    const d = new Date(todayDate);
+    d.setDate(todayDate.getDate() + offsetDays);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); 
+};
+
+const CALENDAR_DAYS = Array.from({length: 10}).map((_, i) => {
+   const d = new Date(todayDate);
+   d.setDate(todayDate.getDate() + i);
+   return {
+      date: d.getDate(),
+      label: formatMockDate(i),
+      monthStr: d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(),
+      isHoliday: i === 2,
+      note: i === 4 ? "Fest" : null
+   };
+});
 
 const EVENT_COLORS = {
   'Tech': { bg: '#E0F2FE', text: '#0284C7', border: '#BAE6FD' },
@@ -32,7 +39,7 @@ const StyledText = styled(Text);
 export default function EventsScreen() {
   const { theme, themeMode } = useContext(AppContext);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedDateLabel, setSelectedDateLabel] = useState("12 Oct");
+  const [selectedDateLabel, setSelectedDateLabel] = useState(formatMockDate(0));
 
   const filteredEvents = EVENTS.filter(e => e.date === selectedDateLabel);
 
@@ -64,7 +71,7 @@ export default function EventsScreen() {
                     {(day.isHoliday || day.note) && (
                        <View className="absolute top-3 w-2 h-2 rounded-full" style={{ backgroundColor: isSelected ? 'white' : highlightColor }} />
                     )}
-                    <Text className="font-bold text-xs mt-2" style={{ color: isSelected ? 'rgba(255,255,255,0.8)' : theme.textLight }}>OCT</Text>
+                    <Text className="font-bold text-xs mt-2" style={{ color: isSelected ? 'rgba(255,255,255,0.8)' : theme.textLight }}>{day.monthStr}</Text>
                     <Text className="text-2xl font-bold" style={{ color: isSelected ? 'white' : theme.text }}>{day.date}</Text>
                     
                     {day.note && !isSelected && (
@@ -89,9 +96,9 @@ export default function EventsScreen() {
            const colors = EVENT_COLORS[event.type] || EVENT_COLORS.Default;
            return (
              <TouchableOpacity key={i} onPress={() => setSelectedEvent(event)} activeOpacity={0.9}>
-                <Animated.View entering={FadeInDown.delay(i*100)} className="p-6 rounded-3xl border mb-4 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+                <Animated.View entering={FadeInDown.delay(i*100)} className="p-6 rounded-3xl border mb-4 shadow-sm" style={{ backgroundColor: theme.surface, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
                    <View className="flex-row justify-between items-start mb-3">
-                      <View className="px-3 py-1 rounded-full border" style={{ backgroundColor: colors.bg, borderColor: colors.border }}>
+                      <View className="px-3 py-1 rounded-full border" style={{ backgroundColor: colors.bg, borderColor: colors.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
                         <Text className="font-bold text-[10px] uppercase tracking-wider" style={{ color: colors.text }}>{event.type}</Text>
                       </View>
                       <Text className="font-bold text-base" style={{ color: theme.text }}>{event.time}</Text>
@@ -118,10 +125,10 @@ export default function EventsScreen() {
                        <TouchableOpacity onPress={() => setSelectedEvent(null)} className="p-2 rounded-full" style={{ backgroundColor: theme.bg }}><X size={24} color={theme.icon}/></TouchableOpacity>
                     </View>
                     
-                    <Text className="text-3xl font-bold mb-4 leading-tight" style={{ color: theme.text }}>{selectedEvent.title}</Text>
+                    <Text className="text-2xl font-bold mb-4 leading-tight" style={{ color: theme.text }}>{selectedEvent.title}</Text>
                     <Text className="text-base font-medium mb-6" style={{ color: theme.textLight }}>{selectedEvent.desc}</Text>
                     
-                    <View className="space-y-4 mb-8 p-6 rounded-2xl border" style={{ backgroundColor: theme.bg, borderColor: theme.border }}>
+                    <View className="space-y-4 mb-8 p-6 rounded-2xl border" style={{ backgroundColor: theme.bg, borderColor: theme.border, borderRadius: theme.radius, borderWidth: theme.borderWidth, shadowOpacity: theme.shadowOp, shadowRadius: 10, shadowOffset: {width: 0, height: 4}, shadowColor: theme.shadowColor, elevation: theme.elevation }}>
                        <View className="flex-row items-center"><Clock size={20} color={theme.textLight}/><Text className="ml-3 text-lg font-medium" style={{ color: theme.text }}>{selectedEvent.date} @ {selectedEvent.time}</Text></View>
                        <View className="flex-row items-center mt-3"><MapPin size={20} color={theme.textLight}/><Text className="ml-3 text-lg font-medium" style={{ color: theme.text }}>{selectedEvent.loc}</Text></View>
                     </View>
